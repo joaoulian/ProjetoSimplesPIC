@@ -1,5 +1,5 @@
-#line 1 "C:/Users/aluno/joao_pic/Trabalho 2/trabalho.c"
-#line 46 "C:/Users/aluno/joao_pic/Trabalho 2/trabalho.c"
+#line 1 "C:/Users/aluno/joao_pic/ProjetoSimplesPIC/trabalho.c"
+#line 46 "C:/Users/aluno/joao_pic/ProjetoSimplesPIC/trabalho.c"
 unsigned char ucTexto[10];
 unsigned char ucPorcentagem;
 unsigned int iLeituraAD = 0;
@@ -90,9 +90,10 @@ void main(){
  WordToStr(tempAD, ucTexto);
  Lcd_Out(1,11,ucTexto);
 
- WordToStr(iLeituraAD, ucTexto);
+ WordToStr(iReg_timer1, ucTexto);
  Lcd_Out(2,1,ucTexto);
  Lcd_Out_CP(" RPM");
+ PORTC.RC1 = ~PORTC.RC1;
  Delay_10us;
  }
 }

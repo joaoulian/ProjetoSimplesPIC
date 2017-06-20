@@ -220,10 +220,10 @@ L_main1:
 	MOVLW       hi_addr(_ucTexto+0)
 	MOVWF       FARG_Lcd_Out_text+1 
 	CALL        _Lcd_Out+0, 0
-;trabalho.c,136 :: 		WordToStr(iLeituraAD, ucTexto);  // Converte o valor lido no iReg_timer1 em string
-	MOVF        _iLeituraAD+0, 0 
+;trabalho.c,136 :: 		WordToStr(iReg_timer1, ucTexto);  // Converte o valor lido no iReg_timer1 em string
+	MOVF        _iReg_timer1+0, 0 
 	MOVWF       FARG_WordToStr_input+0 
-	MOVF        _iLeituraAD+1, 0 
+	MOVF        _iReg_timer1+1, 0 
 	MOVWF       FARG_WordToStr_input+1 
 	MOVLW       _ucTexto+0
 	MOVWF       FARG_WordToStr_output+0 
@@ -246,9 +246,11 @@ L_main1:
 	MOVLW       hi_addr(?lstr2_trabalho+0)
 	MOVWF       FARG_Lcd_Out_CP_text+1 
 	CALL        _Lcd_Out_CP+0, 0
-;trabalho.c,140 :: 		}
-	GOTO        L_main1
+;trabalho.c,139 :: 		PORTC.RC1 = ~PORTC.RC1;           // Alterna som do buzzer.
+	BTG         PORTC+0, 1 
 ;trabalho.c,141 :: 		}
+	GOTO        L_main1
+;trabalho.c,142 :: 		}
 L_end_main:
 	GOTO        $+0
 ; end of _main

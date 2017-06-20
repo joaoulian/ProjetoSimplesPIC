@@ -26,8 +26,8 @@
  |TX       ( 3) = OFF  |DIS3     ( 3) = OFF   |
  |REL1     ( 4) = OFF  |DIS4     ( 4) = OFF   |
  |REL2     ( 5) = OFF  |INFR     ( 5) = ON    |
- |SCK      ( 6) = OFF  |RESIS    ( 6) = OFF   |
- |SDA      ( 7) = OFF  |TEMP     ( 7) = OFF   |
+ |SCK      ( 6) = OFF  |RESIS    ( 6) = ON   |
+ |SDA      ( 7) = OFF  |TEMP     ( 7) = ON   |
  |RTC      ( 8) = OFF  |VENT     ( 8) = ON    |
  |LED1     ( 9) = OFF  |AN0      ( 9) = ON    |
  |LED2     (10) = ON   |AN1      (10) = OFF   |
@@ -133,9 +133,10 @@ void main(){
       WordToStr(tempAD, ucTexto);   // Converte o valor lido no A/D em string
       Lcd_Out(1,11,ucTexto);            // Imprime no LCD o valor do Duty Cycle.
 
-      WordToStr(iLeituraAD, ucTexto);  // Converte o valor lido no iReg_timer1 em string
+      WordToStr(iReg_timer1, ucTexto);  // Converte o valor lido no iReg_timer1 em string
       Lcd_Out(2,1,ucTexto);             // Imprime no LCD o valor da RPM.
       Lcd_Out_CP(" RPM");               // Unidade "RPM".
+      PORTC.RC1 = ~PORTC.RC1;           // Alterna som do buzzer.
       Delay_10us;
    }
 }
