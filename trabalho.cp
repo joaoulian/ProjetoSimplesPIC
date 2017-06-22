@@ -5,6 +5,7 @@ unsigned char ucPorcentagem;
 unsigned int iLeituraAD = 0;
 unsigned int tempAD = 0;
 unsigned int iReg_timer1;
+unsigned int check_btn1 = 0;
 
 
 sbit LCD_RS at RE2_bit;
@@ -41,6 +42,7 @@ void main(){
  TRISC.RC2 = 0;
  TRISC.RC5 = 0;
  TRISC.RC1 = 0;
+ TRISB.RB3=1;
  TRISE = 0;
  PORTB = 0;
 
@@ -75,25 +77,41 @@ void main(){
  Lcd_Cmd(_LCD_CLEAR);
  Lcd_Cmd(_LCD_CURSOR_OFF);
  Lcd_Out(1, 1, "Temp: ");
+ Lcd_Out(2, 1, "Rot: ");
 
  PWM1_Init(5000);
- PWM1_Set_Duty(255);
+ PWM1_Set_Duty(0);
  PWM1_Start();
  PORTC.RC5 = 1;
+ PORTC.RC1 = 1;
  while(1){
  tempAD= ADC_Read(2);
  tempAD/=2;
  iLeituraAD= ADC_Read(0);
  iLeituraAD=(iLeituraAD*0.24);
- PWM1_Set_Duty(iLeituraAD);
+ if (tempAD > 30) {
+ PWM1_Set_Duty(tempAD*4);
+ PORTC.RC1 = 0;
+ }
+ else {
+ PWM1_Set_Duty(0);
+ }
+
+ if (Button(&PORTB, 3, 1, 1)){
+ check_btn1 = 1;
+ }
+ if (check_btn1 && Button(&PORTB, 3, 1, 0)){
+ PORTC.RC5 = ~PORTC.RC5;
+ check_btn1 = 0;
+ }
+
  iLeituraAD=(iLeituraAD*0.41);
  WordToStr(tempAD, ucTexto);
- Lcd_Out(1,11,ucTexto);
+ Lcd_Out(1,8,ucTexto);
 
  WordToStr(iReg_timer1, ucTexto);
- Lcd_Out(2,1,ucTexto);
+ Lcd_Out(2,5,ucTexto);
  Lcd_Out_CP(" RPM");
- PORTC.RC1 = ~PORTC.RC1;
  Delay_10us;
  }
 }

@@ -153,6 +153,7 @@ brg16_bit
 brgh
 brgh_bit
 bsr
+button
 byte2double
 bytetohex
 bytetostr
@@ -222,6 +223,7 @@ ccpr2h
 ccpr2l
 cfgs
 cfgs_bit
+check_btn1
 chs0
 chs0_bit
 chs1
