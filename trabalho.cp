@@ -122,6 +122,10 @@ void main(){
  value = EEPROM_Read(i);;
  media = media + value;
  }
+ FloatToStr(media, ucTexto);
+ Lcd_Out(2,1,ucTexto);
+ Lcd_Out(1, 1, "MEDIA:          ");
+ check_btn2 = 0;
  media = media / amostragem;
  FloatToStr(media, ucTexto);
  check_btn1 = 0;
@@ -130,7 +134,6 @@ void main(){
  check_btn1 = 0;
  amostragem = 0;
  }
-
 
  iLeituraAD=(iLeituraAD*0.41);
  WordToStr(tempAD, ucTexto);

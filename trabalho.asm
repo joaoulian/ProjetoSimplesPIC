@@ -382,7 +382,44 @@ L__main25:
 ;trabalho.c,167 :: 		}
 	GOTO        L_main14
 L_main15:
-;trabalho.c,168 :: 		media = media / amostragem;
+;trabalho.c,168 :: 		FloatToStr(media, ucTexto);
+	MOVF        _media+0, 0 
+	MOVWF       FARG_FloatToStr_fnum+0 
+	MOVF        _media+1, 0 
+	MOVWF       FARG_FloatToStr_fnum+1 
+	MOVF        _media+2, 0 
+	MOVWF       FARG_FloatToStr_fnum+2 
+	MOVF        _media+3, 0 
+	MOVWF       FARG_FloatToStr_fnum+3 
+	MOVLW       _ucTexto+0
+	MOVWF       FARG_FloatToStr_str+0 
+	MOVLW       hi_addr(_ucTexto+0)
+	MOVWF       FARG_FloatToStr_str+1 
+	CALL        _FloatToStr+0, 0
+;trabalho.c,169 :: 		Lcd_Out(2,1,ucTexto);             // Imprime no LCD o valor da RPM.
+	MOVLW       2
+	MOVWF       FARG_Lcd_Out_row+0 
+	MOVLW       1
+	MOVWF       FARG_Lcd_Out_column+0 
+	MOVLW       _ucTexto+0
+	MOVWF       FARG_Lcd_Out_text+0 
+	MOVLW       hi_addr(_ucTexto+0)
+	MOVWF       FARG_Lcd_Out_text+1 
+	CALL        _Lcd_Out+0, 0
+;trabalho.c,170 :: 		Lcd_Out(1, 1, "MEDIA:          ");            // Escreve mensagem no LCD.
+	MOVLW       1
+	MOVWF       FARG_Lcd_Out_row+0 
+	MOVLW       1
+	MOVWF       FARG_Lcd_Out_column+0 
+	MOVLW       ?lstr3_trabalho+0
+	MOVWF       FARG_Lcd_Out_text+0 
+	MOVLW       hi_addr(?lstr3_trabalho+0)
+	MOVWF       FARG_Lcd_Out_text+1 
+	CALL        _Lcd_Out+0, 0
+;trabalho.c,171 :: 		check_btn2 = 0;
+	CLRF        _check_btn2+0 
+	CLRF        _check_btn2+1 
+;trabalho.c,172 :: 		media = media / amostragem;
 	MOVF        _amostragem+0, 0 
 	MOVWF       R0 
 	MOVF        _amostragem+1, 0 
@@ -413,7 +450,7 @@ L_main15:
 	MOVWF       _media+2 
 	MOVF        R3, 0 
 	MOVWF       _media+3 
-;trabalho.c,169 :: 		FloatToStr(media, ucTexto);
+;trabalho.c,173 :: 		FloatToStr(media, ucTexto);
 	MOVF        R0, 0 
 	MOVWF       FARG_FloatToStr_fnum+0 
 	MOVF        R1, 0 
@@ -427,20 +464,20 @@ L_main15:
 	MOVLW       hi_addr(_ucTexto+0)
 	MOVWF       FARG_FloatToStr_str+1 
 	CALL        _FloatToStr+0, 0
-;trabalho.c,170 :: 		check_btn1 = 0;
+;trabalho.c,174 :: 		check_btn1 = 0;
 	CLRF        _check_btn1+0 
 	CLRF        _check_btn1+1 
-;trabalho.c,171 :: 		Lcd_Out(1, 1, "MEDIA:          ");            // Escreve mensagem no LCD.
+;trabalho.c,175 :: 		Lcd_Out(1, 1, "MEDIA:          ");            // Escreve mensagem no LCD.
 	MOVLW       1
 	MOVWF       FARG_Lcd_Out_row+0 
 	MOVLW       1
 	MOVWF       FARG_Lcd_Out_column+0 
-	MOVLW       ?lstr3_trabalho+0
+	MOVLW       ?lstr4_trabalho+0
 	MOVWF       FARG_Lcd_Out_text+0 
-	MOVLW       hi_addr(?lstr3_trabalho+0)
+	MOVLW       hi_addr(?lstr4_trabalho+0)
 	MOVWF       FARG_Lcd_Out_text+1 
 	CALL        _Lcd_Out+0, 0
-;trabalho.c,172 :: 		Lcd_Out(2,1,ucTexto);             // Imprime no LCD o valor da RPM.
+;trabalho.c,176 :: 		Lcd_Out(2,1,ucTexto);             // Imprime no LCD o valor da RPM.
 	MOVLW       2
 	MOVWF       FARG_Lcd_Out_row+0 
 	MOVLW       1
@@ -450,15 +487,15 @@ L_main15:
 	MOVLW       hi_addr(_ucTexto+0)
 	MOVWF       FARG_Lcd_Out_text+1 
 	CALL        _Lcd_Out+0, 0
-;trabalho.c,173 :: 		check_btn1 = 0;
+;trabalho.c,177 :: 		check_btn1 = 0;
 	CLRF        _check_btn1+0 
 	CLRF        _check_btn1+1 
-;trabalho.c,174 :: 		amostragem = 0;
+;trabalho.c,178 :: 		amostragem = 0;
 	CLRF        _amostragem+0 
 	CLRF        _amostragem+1 
-;trabalho.c,175 :: 		}
+;trabalho.c,179 :: 		}
 L_main13:
-;trabalho.c,178 :: 		iLeituraAD=(iLeituraAD*0.41);     // Converte valor para o duty cycle em %
+;trabalho.c,181 :: 		iLeituraAD=(iLeituraAD*0.41);     // Converte valor para o duty cycle em %
 	MOVF        _iLeituraAD+0, 0 
 	MOVWF       R0 
 	MOVF        _iLeituraAD+1, 0 
@@ -478,7 +515,7 @@ L_main13:
 	MOVWF       _iLeituraAD+0 
 	MOVF        R1, 0 
 	MOVWF       _iLeituraAD+1 
-;trabalho.c,179 :: 		WordToStr(tempAD, ucTexto);   // Converte o valor lido no A/D em string
+;trabalho.c,182 :: 		WordToStr(tempAD, ucTexto);   // Converte o valor lido no A/D em string
 	MOVF        _tempAD+0, 0 
 	MOVWF       FARG_WordToStr_input+0 
 	MOVF        _tempAD+1, 0 
@@ -488,7 +525,7 @@ L_main13:
 	MOVLW       hi_addr(_ucTexto+0)
 	MOVWF       FARG_WordToStr_output+1 
 	CALL        _WordToStr+0, 0
-;trabalho.c,180 :: 		Lcd_Out(1,8,ucTexto);            // Imprime no LCD o valor da temperatura.
+;trabalho.c,183 :: 		Lcd_Out(1,8,ucTexto);            // Imprime no LCD o valor da temperatura
 	MOVLW       1
 	MOVWF       FARG_Lcd_Out_row+0 
 	MOVLW       8
@@ -498,7 +535,7 @@ L_main13:
 	MOVLW       hi_addr(_ucTexto+0)
 	MOVWF       FARG_Lcd_Out_text+1 
 	CALL        _Lcd_Out+0, 0
-;trabalho.c,182 :: 		WordToStr(iReg_timer1, ucTexto);  // Converte o valor lido no iReg_timer1 em string
+;trabalho.c,185 :: 		WordToStr(iReg_timer1, ucTexto);  // Converte o valor lido no iReg_timer1 em string
 	MOVF        _iReg_timer1+0, 0 
 	MOVWF       FARG_WordToStr_input+0 
 	MOVF        _iReg_timer1+1, 0 
@@ -508,7 +545,7 @@ L_main13:
 	MOVLW       hi_addr(_ucTexto+0)
 	MOVWF       FARG_WordToStr_output+1 
 	CALL        _WordToStr+0, 0
-;trabalho.c,183 :: 		Lcd_Out(2,5,ucTexto);             // Imprime no LCD o valor da RPM.
+;trabalho.c,186 :: 		Lcd_Out(2,5,ucTexto);             // Imprime no LCD o valor da RPM.
 	MOVLW       2
 	MOVWF       FARG_Lcd_Out_row+0 
 	MOVLW       5
@@ -518,15 +555,15 @@ L_main13:
 	MOVLW       hi_addr(_ucTexto+0)
 	MOVWF       FARG_Lcd_Out_text+1 
 	CALL        _Lcd_Out+0, 0
-;trabalho.c,184 :: 		Lcd_Out_CP(" RPM");               // Unidade "RPM".
-	MOVLW       ?lstr4_trabalho+0
+;trabalho.c,187 :: 		Lcd_Out_CP(" RPM");               // Unidade "RPM".
+	MOVLW       ?lstr5_trabalho+0
 	MOVWF       FARG_Lcd_Out_CP_text+0 
-	MOVLW       hi_addr(?lstr4_trabalho+0)
+	MOVLW       hi_addr(?lstr5_trabalho+0)
 	MOVWF       FARG_Lcd_Out_CP_text+1 
 	CALL        _Lcd_Out_CP+0, 0
-;trabalho.c,186 :: 		}
+;trabalho.c,189 :: 		}
 	GOTO        L_main1
-;trabalho.c,187 :: 		}
+;trabalho.c,190 :: 		}
 L_end_main:
 	GOTO        $+0
 ; end of _main

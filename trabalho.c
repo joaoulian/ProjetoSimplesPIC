@@ -89,8 +89,16 @@ void main(){
    TRISC.RC2 = 0;                    // Define PORTC.RC2 como saida.
    TRISC.RC5 = 0;                    // Define PORTC.RC5 como saida.
    TRISC.RC1 = 0;                    // Define PORTC.RC1 como saida.
-   TRISB.RB2=1;                      // Define o PORTB.RB3 como saida.
+   TRISB.RB2 = 1;                      // Define o PORTB.RB3 como saida.
    TRISE = 0;                        // Define PORTE como saida.
+   
+   unsigned char ucMask[] = {0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F};
+   unsigned int  uiValor;      // Variavel auxiliar para exibição do contador.
+   
+   TRISA.RA2=0;         // Define o pino RA2 do PORTA como saida(Seleção Display 1).
+   TRISA.RA3=0;         // Define o pino RA3 do PORTA como saida(Seleção Display 2).
+   TRISA.RA4=0;         // Define o pino RA4 do PORTA como saida(Seleção Display 3).
+   TRISA.RA5=0;         // Define o pino RA5 do PORTA como saida(Seleção Display 4).
 
    // Configuração das interrupções
    INTCON.GIEH = 1;   // Habilita as interrupções e a interrupção de alta prioridade.
@@ -141,7 +149,7 @@ void main(){
       
       iLeituraAD = ADC_Read(0);          // Lê Canal AD 0
       iLeituraAD=(iLeituraAD*0.24);     // Converte valor para o duty cycle [255/(1023 pontos do A/D)]
-      if (tempAD > 30) {
+     if (tempAD > 30) {
          PWM1_Set_Duty(tempAD*3);        // Envia o valor lido de "iLeituraAD" para o módulo CCP1 PWM
          PORTC.RC1 = 0;
       }
@@ -165,6 +173,10 @@ void main(){
            value = EEPROM_Read(i);;
            media = media + value;
          }
+         FloatToStr(media, ucTexto);
+         Lcd_Out(2,1,ucTexto);             // Imprime no LCD o valor da RPM.
+         Lcd_Out(1, 1, "MEDIA:          ");            // Escreve mensagem no LCD.
+         check_btn2 = 0;
          media = media / amostragem;
          FloatToStr(media, ucTexto);
          check_btn1 = 0;
@@ -174,10 +186,9 @@ void main(){
          amostragem = 0;
       }
       
-      
       iLeituraAD=(iLeituraAD*0.41);     // Converte valor para o duty cycle em %
       WordToStr(tempAD, ucTexto);   // Converte o valor lido no A/D em string
-      Lcd_Out(1,8,ucTexto);            // Imprime no LCD o valor da temperatura.
+      Lcd_Out(1,8,ucTexto);            // Imprime no LCD o valor da temperatura
 
       WordToStr(iReg_timer1, ucTexto);  // Converte o valor lido no iReg_timer1 em string
       Lcd_Out(2,5,ucTexto);             // Imprime no LCD o valor da RPM.
