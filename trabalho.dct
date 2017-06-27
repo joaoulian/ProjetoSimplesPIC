@@ -97,6 +97,7 @@ adon_bit
 adres
 adresh
 adresl
+amostragem
 an0
 an0_bit
 an1
@@ -224,6 +225,7 @@ ccpr2l
 cfgs
 cfgs_bit
 check_btn1
+check_btn2
 chs0
 chs0_bit
 chs1
@@ -354,6 +356,8 @@ eeip
 eeip_bit
 eepgd
 eepgd_bit
+eeprom_read
+eeprom_write
 equals_double
 f
 fast
@@ -415,6 +419,7 @@ hlvdl2
 hlvdl2_bit
 hlvdl3
 hlvdl3_bit
+i
 ibf_trise_bit
 ibov_trise_bit
 ics_auto
@@ -637,6 +642,7 @@ lvv3_bit
 main
 mclr
 mclr_bit
+media
 memchr
 memcmp
 memcpy
@@ -1338,6 +1344,7 @@ ua
 ua_bit
 ucporcentagem
 uctexto
+value
 vcfg0
 vcfg0_bit
 vcfg1

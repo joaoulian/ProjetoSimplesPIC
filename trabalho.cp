@@ -6,6 +6,11 @@ unsigned int iLeituraAD = 0;
 unsigned int tempAD = 0;
 unsigned int iReg_timer1;
 unsigned int check_btn1 = 0;
+unsigned int check_btn2 = 0;
+int amostragem = 1;
+short i;
+float media;
+int value = 0;
 
 
 sbit LCD_RS at RE2_bit;
@@ -25,7 +30,6 @@ sbit LCD_D4_Direction at TRISD4_bit;
 
 void interrupt(){
  if (INTCON.TMR0IF == 1){
- PORTB.RB0 = ~PORTB.RB0;
  TMR0L = 0X7B;
  TMR0H = 0XE1;
  INTCON.TMR0IF = 0;
@@ -42,9 +46,8 @@ void main(){
  TRISC.RC2 = 0;
  TRISC.RC5 = 0;
  TRISC.RC1 = 0;
- TRISB.RB3=1;
+ TRISB.RB2=1;
  TRISE = 0;
- PORTB = 0;
 
 
  INTCON.GIEH = 1;
@@ -84,26 +87,50 @@ void main(){
  PWM1_Start();
  PORTC.RC5 = 1;
  PORTC.RC1 = 1;
+
  while(1){
+
  tempAD= ADC_Read(2);
  tempAD/=2;
- iLeituraAD= ADC_Read(0);
+ EEPROM_Write(amostragem,tempAD);
+ Delay_ms(100);
+ amostragem++;
+
+ iLeituraAD = ADC_Read(0);
  iLeituraAD=(iLeituraAD*0.24);
  if (tempAD > 30) {
- PWM1_Set_Duty(tempAD*4);
+ PWM1_Set_Duty(tempAD*3);
  PORTC.RC1 = 0;
  }
  else {
  PWM1_Set_Duty(0);
  }
 
- if (Button(&PORTB, 3, 1, 1)){
+ if (Button(&PORTB, 2, 1, 1)){
  check_btn1 = 1;
  }
- if (check_btn1 && Button(&PORTB, 3, 1, 0)){
+ if (check_btn1 && Button(&PORTB, 2, 1, 0)){
  PORTC.RC5 = ~PORTC.RC5;
  check_btn1 = 0;
  }
+
+ if (Button(&PORTB, 0, 1, 1)){
+ check_btn2 = 1;
+ }
+ if (check_btn2 && Button(&PORTB, 0, 1, 0)){
+ for (i = 1; i <= amostragem; i++){
+ value = EEPROM_Read(i);;
+ media = media + value;
+ }
+ media = media / amostragem;
+ FloatToStr(media, ucTexto);
+ check_btn1 = 0;
+ Lcd_Out(1, 1, "MEDIA:          ");
+ Lcd_Out(2,1,ucTexto);
+ check_btn1 = 0;
+ amostragem = 0;
+ }
+
 
  iLeituraAD=(iLeituraAD*0.41);
  WordToStr(tempAD, ucTexto);

@@ -23,6 +23,7 @@ main
 	PWM1_Start
 	ADC_Read
 		Delay_22us
+	EEPROM_Write
 	word2double
 		NRM3232
 			RES032
@@ -38,10 +39,4 @@ main
 		Delay_500us
 	WordToStr
 		Div_16X16_U
-	Lcd_Out_CP
-		Lcd_Chr_CP
-			Lcd_Cmd
-				Delay_1us
-				Delay_5500us
-				Delay_50us
 interrupt

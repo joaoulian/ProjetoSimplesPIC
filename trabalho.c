@@ -49,6 +49,11 @@ unsigned int iLeituraAD = 0; // Define variável para armazenamento da leitura AD
 unsigned int tempAD = 0; // Define variável para armazenamento da leitura AD.
 unsigned int iReg_timer1;    // Armazena o RPM.
 unsigned int check_btn1 = 0;
+unsigned int check_btn2 = 0;
+int amostragem = 1;
+short i;
+float media;
+int value = 0;
 
 // CONFIGURAÇÃO DOS PINOS DO LCD.
 sbit LCD_RS at RE2_bit;
@@ -68,7 +73,6 @@ sbit LCD_D4_Direction at TRISD4_bit;
 
 void interrupt(){
    if (INTCON.TMR0IF == 1){    // Se o flag de estouro do TIMER0 for igual a 1, então
-      PORTB.RB0 = ~PORTB.RB0;  // Inverte o estado do PORTB.RB0.
       TMR0L = 0X7B;                  // Carrega valores de contagem
       TMR0H = 0XE1;                  // Carrega valores de contagem
       INTCON.TMR0IF = 0;             // Seta T0IE, apaga flag de entouro do TIMER0
@@ -85,9 +89,8 @@ void main(){
    TRISC.RC2 = 0;                    // Define PORTC.RC2 como saida.
    TRISC.RC5 = 0;                    // Define PORTC.RC5 como saida.
    TRISC.RC1 = 0;                    // Define PORTC.RC1 como saida.
-   TRISB.RB3=1;                      // Define o PORTB.RB3 como saida.
+   TRISB.RB2=1;                      // Define o PORTB.RB3 como saida.
    TRISE = 0;                        // Define PORTE como saida.
-   PORTB = 0;                        // Limpa PORTB.
 
    // Configuração das interrupções
    INTCON.GIEH = 1;   // Habilita as interrupções e a interrupção de alta prioridade.
@@ -127,10 +130,16 @@ void main(){
    PWM1_Start();                     // Inicia PWM.
    PORTC.RC5 = 1;                            // Liga resistencia de aquecimento.
    PORTC.RC1 = 1;
-   while(1){   // Aqui Definimos Uma Condição Sempre Verdadeira Como Parametro, Portanto Todo O Bloco Será Repetido Indefinidamente.
+
+   while(1){
+       // Aqui Definimos Uma Condição Sempre Verdadeira Como Parametro, Portanto Todo O Bloco Será Repetido Indefinidamente.
       tempAD= ADC_Read(2);          // Lê Canal AD 2
       tempAD/=2;                    // Converte valor do sensor LM35
-      iLeituraAD= ADC_Read(0);          // Lê Canal AD 0
+      EEPROM_Write(amostragem,tempAD);   // Grava na EEPROM valores de 0 a 10 em ASCII.
+      Delay_ms(100);
+      amostragem++;
+      
+      iLeituraAD = ADC_Read(0);          // Lê Canal AD 0
       iLeituraAD=(iLeituraAD*0.24);     // Converte valor para o duty cycle [255/(1023 pontos do A/D)]
       if (tempAD > 30) {
          PWM1_Set_Duty(tempAD*3);        // Envia o valor lido de "iLeituraAD" para o módulo CCP1 PWM
@@ -140,13 +149,31 @@ void main(){
          PWM1_Set_Duty(0);               // Seta o Duty-cycle do PWM em 100%.
       }
       
-      if (Button(&PORTB, 3, 1, 1)){
+      if (Button(&PORTB, 2, 1, 1)){
          check_btn1 = 1;
       }
-      if (check_btn1 && Button(&PORTB, 3, 1, 0)){
+      if (check_btn1 && Button(&PORTB, 2, 1, 0)){
          PORTC.RC5 = ~PORTC.RC5;
          check_btn1 = 0;
       }
+      
+      if (Button(&PORTB, 0, 1, 1)){
+         check_btn2 = 1;
+      }
+      if (check_btn2 && Button(&PORTB, 0, 1, 0)){
+          for (i = 1; i <= amostragem; i++){
+           value = EEPROM_Read(i);;
+           media = media + value;
+         }
+         media = media / amostragem;
+         FloatToStr(media, ucTexto);
+         check_btn1 = 0;
+         Lcd_Out(1, 1, "MEDIA:          ");            // Escreve mensagem no LCD.
+         Lcd_Out(2,1,ucTexto);             // Imprime no LCD o valor da RPM.
+         check_btn1 = 0;
+         amostragem = 0;
+      }
+      
       
       iLeituraAD=(iLeituraAD*0.41);     // Converte valor para o duty cycle em %
       WordToStr(tempAD, ucTexto);   // Converte o valor lido no A/D em string
