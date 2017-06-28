@@ -1,6 +1,5 @@
 /*
                Microgenios Soluções Eletrônicas Ltda.
-
 ********************************************************************************
  PROGRAMA EXEMPLO: Leitura do canal A/D AN0, mostrar a representação no PWM
                    da ventoinha E utilizar infravermelho para verificar RPM.
@@ -9,16 +8,12 @@
 ********************************************************************************
  MICROCONTROLADOR: PIC18F4520.
  http://ww1.microchip.com/downloads/en/DeviceDoc/39631E.pdf
-
  PLACA DE DESENVOLVIMENTO: KIT PICgenios - PIC18F
  http://www.microgenios.com.br/news/index.php?option=com_content&task=view&id=88&Itemid=134
-
  SOFTWARE: MikroC PRO for PIC
  http://www.mikroe.com/en/compilers/mikroc/pro/pic/
-
 ************************ Configurações do KIT Picgenios ************************
  CRISTAL: 8Mhz.
-
  CHAVES DE FUNÇÃO:
   --------------------- ----------------------
  |GLCD\LCD ( 1) = ON   |DIS1     ( 1) = OFF   |
@@ -46,14 +41,21 @@ OBS:
 unsigned char ucTexto[10];   // Matriz para armazenamento de texto.
 unsigned char ucPorcentagem; // Armazena a porcentagem do PWM.
 unsigned int iLeituraAD = 0; // Define variável para armazenamento da leitura AD.
-unsigned int tempAD = 0; // Define variável para armazenamento da leitura AD.
+unsigned int temperatura = 0; // Define variável para armazenamento da leitura AD.
+unsigned int tempDisplay = 0; // Define variável para armazenamento da leitura AD.
 unsigned int iReg_timer1;    // Armazena o RPM.
 unsigned int check_btn1 = 0;
 unsigned int check_btn2 = 0;
-int amostragem = 1;
-short i;
-float media;
-int value = 0;
+unsigned int amostragem = 0;
+int digitoA;
+int digitoB;
+int digitoC;
+int digitoD;
+
+//FUNCOES
+void calculaMedia();
+void imprimeDisplay( int b, int c, int d);
+void quebraDezenas(int temperatura1,int temperatura2);
 
 // CONFIGURAÇÃO DOS PINOS DO LCD.
 sbit LCD_RS at RE2_bit;
@@ -89,17 +91,15 @@ void main(){
    TRISC.RC2 = 0;                    // Define PORTC.RC2 como saida.
    TRISC.RC5 = 0;                    // Define PORTC.RC5 como saida.
    TRISC.RC1 = 0;                    // Define PORTC.RC1 como saida.
-   TRISB.RB2 = 1;                      // Define o PORTB.RB3 como saida.
+   TRISB.RB3 = 1;                      // Define o PORTB.RB3 como saida.
    TRISE = 0;                        // Define PORTE como saida.
+   PORTB = 0;                        // Limpa PORTB.
    
-   unsigned char ucMask[] = {0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F};
-   unsigned int  uiValor;      // Variavel auxiliar para exibição do contador.
-   
-   TRISA.RA2=0;         // Define o pino RA2 do PORTA como saida(Seleção Display 1).
+   //TRISA.RA2=0;         // Define o pino RA2 do PORTA como saida(Seleção Display 1).
    TRISA.RA3=0;         // Define o pino RA3 do PORTA como saida(Seleção Display 2).
    TRISA.RA4=0;         // Define o pino RA4 do PORTA como saida(Seleção Display 3).
    TRISA.RA5=0;         // Define o pino RA5 do PORTA como saida(Seleção Display 4).
-
+   
    // Configuração das interrupções
    INTCON.GIEH = 1;   // Habilita as interrupções e a interrupção de alta prioridade.
    INTCON.GIEL = 1;   // Habilita as interrupções e a interrupção de baixa prioridade
@@ -111,8 +111,9 @@ void main(){
    INTCON.TMR0IE = 1;
 
    T0CON = 0B10000100; // Configura timer modo 16 bits, com prescaler
-   TMR0L = 0X7B;       // Carrega valores de contagem
-   TMR0H = 0XE1;       // Carrega valores de contagem
+   // Valor para 1 segundo.
+   TMR0H = 0xDB;            // Carrega o valor alto do número 57723.
+   TMR0L = 0x61;            // Carrega o valor baixo do numero 57723.
    INTCON.TMR0IF = 0;  // Apaga flag de estouro do TIMER0
 
    // Timer 1
@@ -127,10 +128,9 @@ void main(){
 
    // Config. LCD no modo 4 bits
    Lcd_Init();                               // Inicializa LCD.
-
    Lcd_Cmd(_LCD_CLEAR);                      // Apaga display.
    Lcd_Cmd(_LCD_CURSOR_OFF);                 // Desliga cursor.
-   Lcd_Out(1, 1, "Temp: ");            // Escreve mensagem no LCD.
+   Lcd_Out(1, 1, "TempMedia: ");            // Escreve mensagem no LCD.
    Lcd_Out(2, 1, "Rot: ");            // Escreve mensagem no LCD.
 
    PWM1_Init(5000);                  // Inicializa módulo PWM com 5Khz
@@ -138,61 +138,78 @@ void main(){
    PWM1_Start();                     // Inicia PWM.
    PORTC.RC5 = 1;                            // Liga resistencia de aquecimento.
    PORTC.RC1 = 1;
-
+   PORTC.RB0 = 0;
    while(1){
-       // Aqui Definimos Uma Condição Sempre Verdadeira Como Parametro, Portanto Todo O Bloco Será Repetido Indefinidamente.
-      tempAD= ADC_Read(2);          // Lê Canal AD 2
-      tempAD/=2;                    // Converte valor do sensor LM35
-      EEPROM_Write(amostragem,tempAD);   // Grava na EEPROM valores de 0 a 10 em ASCII.
-      Delay_ms(100);
+      temperatura = ADC_Read(2);          // Lê Canal AD 2
+      temperatura/=2;                    // Converte valor do sensor LM35
+      EEPROM_Write(amostragem,temperatura);
       amostragem++;
-      
-      iLeituraAD = ADC_Read(0);          // Lê Canal AD 0
+      if (amostragem == 150){
+         tempDisplay = temperatura;
+         calculaMedia();
+         amostragem = 0;
+      }
+      iLeituraAD= ADC_Read(0);          // Lê Canal AD 0
       iLeituraAD=(iLeituraAD*0.24);     // Converte valor para o duty cycle [255/(1023 pontos do A/D)]
-     if (tempAD > 30) {
-         PWM1_Set_Duty(tempAD*3);        // Envia o valor lido de "iLeituraAD" para o módulo CCP1 PWM
+      if (temperatura > 30) {
+         PWM1_Set_Duty(temperatura*3);        // Envia o valor lido de "iLeituraAD" para o módulo CCP1 PWM
          PORTC.RC1 = 0;
       }
       else {
          PWM1_Set_Duty(0);               // Seta o Duty-cycle do PWM em 100%.
       }
-      
-      if (Button(&PORTB, 2, 1, 1)){
+
+      if (Button(&PORTB, 3, 1, 1)){
          check_btn1 = 1;
       }
-      if (check_btn1 && Button(&PORTB, 2, 1, 0)){
+      if (check_btn1 && Button(&PORTB, 3, 1, 0)){
          PORTC.RC5 = ~PORTC.RC5;
+         PORTB.RB0 = ~PORTB.RB0;
          check_btn1 = 0;
       }
+
+      quebraDezenas(0,tempDisplay);
+      imprimeDisplay(digitoB,digitoC,digitoD);
       
-      if (Button(&PORTB, 0, 1, 1)){
-         check_btn2 = 1;
-      }
-      if (check_btn2 && Button(&PORTB, 0, 1, 0)){
-          for (i = 1; i <= amostragem; i++){
-           value = EEPROM_Read(i);;
-           media = media + value;
-         }
-         FloatToStr(media, ucTexto);
-         Lcd_Out(2,1,ucTexto);             // Imprime no LCD o valor da RPM.
-         Lcd_Out(1, 1, "MEDIA:          ");            // Escreve mensagem no LCD.
-         check_btn2 = 0;
-         media = media / amostragem;
-         FloatToStr(media, ucTexto);
-         check_btn1 = 0;
-         Lcd_Out(1, 1, "MEDIA:          ");            // Escreve mensagem no LCD.
-         Lcd_Out(2,1,ucTexto);             // Imprime no LCD o valor da RPM.
-         check_btn1 = 0;
-         amostragem = 0;
-      }
-      
-      iLeituraAD=(iLeituraAD*0.41);     // Converte valor para o duty cycle em %
-      WordToStr(tempAD, ucTexto);   // Converte o valor lido no A/D em string
-      Lcd_Out(1,8,ucTexto);            // Imprime no LCD o valor da temperatura
+      /*iLeituraAD=(iLeituraAD*0.41);     // Converte valor para o duty cycle em %
+      WordToStr(temperatura, ucTexto);   // Converte o valor lido no A/D em string
+      Lcd_Out(1,3,ucTexto);            // Imprime no LCD o valor da temperatura. */
 
       WordToStr(iReg_timer1, ucTexto);  // Converte o valor lido no iReg_timer1 em string
-      Lcd_Out(2,5,ucTexto);             // Imprime no LCD o valor da RPM.
-      Lcd_Out_CP(" RPM");               // Unidade "RPM".
+      Lcd_Out(2,6,ucTexto);             // Imprime no LCD o valor da RPM.
       Delay_10us;
    }
+}
+
+void quebraDezenas(int temperatura1,int temperatura2){
+     digitoA=temperatura1/10;
+     digitoB=temperatura1%10;
+     digitoC=temperatura2/10;
+     digitoD=temperatura2%10;
+}
+void imprimeDisplay( int b, int c, int d){
+                           //  "0"  "1"  "2"  "3"  "4"  "5"  "6"  "7"  "8"  "9"  "<"  ">"  "-"
+    unsigned char ucMask[] = {0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F,0x21,0x03,0x40};
+    PORTD = ucMask[b];
+    PORTA.RA3 = 1;
+    Delay_ms(2);
+    PORTA.RA3 = 0;
+    PORTD = ucMask[c];
+    PORTA.RA4 = 1;
+    Delay_ms(2);
+    PORTA.RA4 = 0;
+    PORTD = ucMask[d];
+    PORTA.RA5 = 1;
+    Delay_ms(2);
+    PORTA.RA5 = 0;
+}
+
+void calculaMedia(){
+      float aux2=0;
+      int i;
+      for(i=0;i<amostragem;i++){
+            aux2 = aux2 + EEPROM_Read(i);
+      }
+      FloatToStr((aux2/amostragem),ucTexto);
+      Lcd_Out(1,12,ucTexto);
 }

@@ -172,6 +172,7 @@ c2out_cmcon
 c2out_cmcon_bit
 c2out_porta
 c2out_porta_bit
+calculamedia
 ccp1
 ccp1_bit
 ccp1con
@@ -318,6 +319,10 @@ delay_5ms
 delay_80us
 delay_8ms
 delay_cyc
+digitoa
+digitob
+digitoc
+digitod
 div_16x16_s
 div_16x16_s_l
 div_16x16_u
@@ -419,7 +424,6 @@ hlvdl2
 hlvdl2_bit
 hlvdl3
 hlvdl3_bit
-i
 ibf_trise_bit
 ibov_trise_bit
 ics_auto
@@ -427,6 +431,7 @@ ics_off
 idlen
 idlen_bit
 ileituraad
+imprimedisplay
 indf0
 indf1
 indf2
@@ -642,7 +647,6 @@ lvv3_bit
 main
 mclr
 mclr_bit
-media
 memchr
 memcmp
 memcpy
@@ -850,6 +854,7 @@ pwm2_init
 pwm2_set_duty
 pwm2_start
 pwm2_stop
+quebradezenas
 r
 r_bit
 r_not_w
@@ -1178,7 +1183,8 @@ tblptru3
 tblptru3_bit
 tblptru4
 tblptru4_bit
-tempad
+tempdisplay
+temperatura
 tmr0h
 tmr0ie
 tmr0ie_bit
@@ -1344,7 +1350,6 @@ ua
 ua_bit
 ucporcentagem
 uctexto
-value
 vcfg0
 vcfg0_bit
 vcfg1
