@@ -24,9 +24,8 @@ Count=0
 Count=0
 ActiveImageIndex=-1
 [OPENED_FILES]
-Count=2
+Count=1
 File0=trabalho.c
-File1=..\..\Henrique\Projeto2\ProjetoFinal2.c
 [EEPROM]
 Count=0
 [ACTIVE_COMMENTS_FILES]
@@ -37,7 +36,7 @@ Count=0
 Count=4
 Path0=C:\Program Files\mikroC PRO for PIC\Defs\
 Path1=C:\Program Files\mikroC PRO for PIC\uses\P18\
-Path2=C:\Users\aluno\Desktop\joao\ProjetoSimplesPIC\
+Path2=C:\Users\aluno\Desktop\ProjetoFinal\ProjetoSimplesPIC\
 [HEADER_PATH]
 Count=0
 [HEADERS]

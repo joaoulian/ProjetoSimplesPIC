@@ -41,7 +41,7 @@ OBS:
 unsigned char ucTexto[10];   // Matriz para armazenamento de texto.
 unsigned char ucPorcentagem; // Armazena a porcentagem do PWM.
 unsigned int iLeituraAD = 0; // Define variável para armazenamento da leitura AD.
-unsigned int temperatura = 0; // Define variável para armazenamento da leitura AD.
+unsigned int temperatura = 0; // Define variável para armazenamento da leitura AD
 unsigned int tempDisplay = 0; // Define variável para armazenamento da leitura AD.
 unsigned int iReg_timer1;    // Armazena o RPM.
 unsigned int check_btn1 = 0;
@@ -51,11 +51,13 @@ int digitoA;
 int digitoB;
 int digitoC;
 int digitoD;
+unsigned int modo = 0;
+float dutyCicle = 0;
 
 //FUNCOES
 void calculaMedia();
 void imprimeDisplay( int b, int c, int d);
-void quebraDezenas(int temperatura1,int temperatura2);
+void quebraDezenas(int x);
 
 // CONFIGURAÇÃO DOS PINOS DO LCD.
 sbit LCD_RS at RE2_bit;
@@ -92,6 +94,7 @@ void main(){
    TRISC.RC5 = 0;                    // Define PORTC.RC5 como saida.
    TRISC.RC1 = 0;                    // Define PORTC.RC1 como saida.
    TRISB.RB3 = 1;                      // Define o PORTB.RB3 como saida.
+   TRISB.RB4 = 1;
    TRISE = 0;                        // Define PORTE como saida.
    PORTB = 0;                        // Limpa PORTB.
    
@@ -149,15 +152,23 @@ void main(){
          calculaMedia();
          amostragem = 0;
       }
-      iLeituraAD= ADC_Read(0);          // Lê Canal AD 0
+      iLeituraAD = ADC_Read(0);          // Lê Canal AD 0
       iLeituraAD=(iLeituraAD*0.24);     // Converte valor para o duty cycle [255/(1023 pontos do A/D)]
-      if (temperatura > 30) {
-         PWM1_Set_Duty(temperatura*3);        // Envia o valor lido de "iLeituraAD" para o módulo CCP1 PWM
+      temperatura=(temperatura/0.15);
+      if (modo == 0){
+        if (temperatura > 30) {
+         dutyCicle = temperatura;
          PORTC.RC1 = 0;
+        }
+        else {
+           dutyCicle = 0;
+        }
       }
-      else {
-         PWM1_Set_Duty(0);               // Seta o Duty-cycle do PWM em 100%.
+      else if (modo == 1){
+        dutyCicle = iLeituraAD;
       }
+      
+      PWM1_Set_Duty(dutyCicle);        // Envia o valor lido de "iLeituraAD" para o módulo CCP1 PWM
 
       if (Button(&PORTB, 3, 1, 1)){
          check_btn1 = 1;
@@ -167,8 +178,22 @@ void main(){
          PORTB.RB0 = ~PORTB.RB0;
          check_btn1 = 0;
       }
-
-      quebraDezenas(0,tempDisplay);
+      if (Button(&PORTB, 4, 1, 1)){
+         check_btn2 = 1;
+      }
+      if (check_btn2 && Button(&PORTB, 4, 1, 0)){
+         PORTC.RC5 = ~PORTC.RC5;
+         PORTB.RB0 = ~PORTB.RB0;
+         check_btn2 = 0;
+         if (modo == 0){
+           modo = 1;
+         }
+         else {
+           modo = 0;
+         }
+      }
+      iLeituraAD =(iLeituraAD*0.41);     // Converte valor para o duty cycle em %
+      quebraDezenas(iLeituraAD);
       imprimeDisplay(digitoB,digitoC,digitoD);
       
       /*iLeituraAD=(iLeituraAD*0.41);     // Converte valor para o duty cycle em %
@@ -181,11 +206,12 @@ void main(){
    }
 }
 
-void quebraDezenas(int temperatura1,int temperatura2){
-     digitoA=temperatura1/10;
-     digitoB=temperatura1%10;
-     digitoC=temperatura2/10;
-     digitoD=temperatura2%10;
+void quebraDezenas(int x){
+     digitoD=x%10;
+     x = x / 10;
+     digitoC=x%10;
+     x = x / 10;
+     digitoB=x%10;
 }
 void imprimeDisplay( int b, int c, int d){
                            //  "0"  "1"  "2"  "3"  "4"  "5"  "6"  "7"  "8"  "9"  "<"  ">"  "-"

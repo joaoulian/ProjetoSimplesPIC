@@ -1,5 +1,5 @@
-#line 1 "C:/Users/aluno/Desktop/joao/ProjetoSimplesPIC/trabalho.c"
-#line 41 "C:/Users/aluno/Desktop/joao/ProjetoSimplesPIC/trabalho.c"
+#line 1 "C:/Users/aluno/Desktop/ProjetoFinal/ProjetoSimplesPIC/trabalho.c"
+#line 41 "C:/Users/aluno/Desktop/ProjetoFinal/ProjetoSimplesPIC/trabalho.c"
 unsigned char ucTexto[10];
 unsigned char ucPorcentagem;
 unsigned int iLeituraAD = 0;
@@ -13,11 +13,13 @@ int digitoA;
 int digitoB;
 int digitoC;
 int digitoD;
+unsigned int modo = 0;
+float dutyCicle = 0;
 
 
 void calculaMedia();
 void imprimeDisplay( int b, int c, int d);
-void quebraDezenas(int temperatura1,int temperatura2);
+void quebraDezenas(int x);
 
 
 sbit LCD_RS at RE2_bit;
@@ -54,6 +56,7 @@ void main(){
  TRISC.RC5 = 0;
  TRISC.RC1 = 0;
  TRISB.RB3 = 1;
+ TRISB.RB4 = 1;
  TRISE = 0;
  PORTB = 0;
 
@@ -111,15 +114,23 @@ void main(){
  calculaMedia();
  amostragem = 0;
  }
- iLeituraAD= ADC_Read(0);
+ iLeituraAD = ADC_Read(0);
  iLeituraAD=(iLeituraAD*0.24);
+ temperatura=(temperatura/0.15);
+ if (modo == 0){
  if (temperatura > 30) {
- PWM1_Set_Duty(temperatura*3);
+ dutyCicle = temperatura;
  PORTC.RC1 = 0;
  }
  else {
- PWM1_Set_Duty(0);
+ dutyCicle = 0;
  }
+ }
+ else if (modo == 1){
+ dutyCicle = iLeituraAD;
+ }
+
+ PWM1_Set_Duty(dutyCicle);
 
  if (Button(&PORTB, 3, 1, 1)){
  check_btn1 = 1;
@@ -129,21 +140,36 @@ void main(){
  PORTB.RB0 = ~PORTB.RB0;
  check_btn1 = 0;
  }
-
- quebraDezenas(0,tempDisplay);
+ if (Button(&PORTB, 4, 1, 1)){
+ check_btn2 = 1;
+ }
+ if (check_btn2 && Button(&PORTB, 4, 1, 0)){
+ PORTC.RC5 = ~PORTC.RC5;
+ PORTB.RB0 = ~PORTB.RB0;
+ check_btn2 = 0;
+ if (modo == 0){
+ modo = 1;
+ }
+ else {
+ modo = 0;
+ }
+ }
+ iLeituraAD =(iLeituraAD*0.41);
+ quebraDezenas(iLeituraAD);
  imprimeDisplay(digitoB,digitoC,digitoD);
-#line 178 "C:/Users/aluno/Desktop/joao/ProjetoSimplesPIC/trabalho.c"
+#line 203 "C:/Users/aluno/Desktop/ProjetoFinal/ProjetoSimplesPIC/trabalho.c"
  WordToStr(iReg_timer1, ucTexto);
  Lcd_Out(2,6,ucTexto);
  Delay_10us;
  }
 }
 
-void quebraDezenas(int temperatura1,int temperatura2){
- digitoA=temperatura1/10;
- digitoB=temperatura1%10;
- digitoC=temperatura2/10;
- digitoD=temperatura2%10;
+void quebraDezenas(int x){
+ digitoD=x%10;
+ x = x / 10;
+ digitoC=x%10;
+ x = x / 10;
+ digitoB=x%10;
 }
 void imprimeDisplay( int b, int c, int d){
 

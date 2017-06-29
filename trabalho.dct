@@ -338,6 +338,7 @@ double2int
 double2longint
 double2longword
 double2word
+dutycicle
 eccp1as
 eccp1del
 eccpas
@@ -652,6 +653,7 @@ memcmp
 memcpy
 memmove
 memset
+modo
 mul_16x16_s
 mul_16x16_u
 mul_32x32_fp
