@@ -4,6 +4,7 @@ unsigned char ucTexto[10];
 unsigned char ucPorcentagem;
 unsigned int iLeituraAD = 0;
 unsigned int temperatura = 0;
+unsigned int tempDuty = 0;
 unsigned int tempDisplay = 0;
 unsigned int iReg_timer1;
 unsigned int check_btn1 = 0;
@@ -116,10 +117,10 @@ void main(){
  }
  iLeituraAD = ADC_Read(0);
  iLeituraAD=(iLeituraAD*0.24);
- temperatura=(temperatura/0.15);
+ tempDuty=(temperatura/0.24);
  if (modo == 0){
  if (temperatura > 30) {
- dutyCicle = temperatura;
+ dutyCicle = tempDuty;
  PORTC.RC1 = 0;
  }
  else {
@@ -157,7 +158,7 @@ void main(){
  iLeituraAD =(iLeituraAD*0.41);
  quebraDezenas(iLeituraAD);
  imprimeDisplay(digitoB,digitoC,digitoD);
-#line 203 "C:/Users/aluno/Desktop/ProjetoFinal/ProjetoSimplesPIC/trabalho.c"
+#line 204 "C:/Users/aluno/Desktop/ProjetoFinal/ProjetoSimplesPIC/trabalho.c"
  WordToStr(iReg_timer1, ucTexto);
  Lcd_Out(2,6,ucTexto);
  Delay_10us;

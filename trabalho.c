@@ -42,6 +42,7 @@ unsigned char ucTexto[10];   // Matriz para armazenamento de texto.
 unsigned char ucPorcentagem; // Armazena a porcentagem do PWM.
 unsigned int iLeituraAD = 0; // Define variável para armazenamento da leitura AD.
 unsigned int temperatura = 0; // Define variável para armazenamento da leitura AD
+unsigned int tempDuty = 0; // Define variável para armazenamento da leitura AD
 unsigned int tempDisplay = 0; // Define variável para armazenamento da leitura AD.
 unsigned int iReg_timer1;    // Armazena o RPM.
 unsigned int check_btn1 = 0;
@@ -154,10 +155,10 @@ void main(){
       }
       iLeituraAD = ADC_Read(0);          // Lê Canal AD 0
       iLeituraAD=(iLeituraAD*0.24);     // Converte valor para o duty cycle [255/(1023 pontos do A/D)]
-      temperatura=(temperatura/0.15);
+      tempDuty=(temperatura/0.24);
       if (modo == 0){
         if (temperatura > 30) {
-         dutyCicle = temperatura;
+         dutyCicle = tempDuty;
          PORTC.RC1 = 0;
         }
         else {
